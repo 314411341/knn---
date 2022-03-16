@@ -1,0 +1,46 @@
+import operator
+
+import numpy as np
+def createDataset():
+    group = np.array([[1, 101], [5, 89], [108, 5], [115, 8]])
+    lables = ['爱情片', '爱情片', '喜剧片', 'dongzuopian']
+    print(group)
+    print(lables)
+    return group, lables
+
+
+def classify0(inx, dataset, lables, k):
+    #numpy函数shape[0]返回dataset的行数datasetsize
+    datasetsize = dataset.shape[0]
+    #tile变成和group同类型的张量，然后相减
+    diffmat = np.tile(inx, (datasetsize, 1)) - dataset
+    #相减后平方
+    sqDiffmat = diffmat**2
+
+    sqdistance = sqDiffmat.sum(axis=1)
+
+    distances = sqdistance**0.5
+
+    sortedDistindices = distances.argsort()
+    #distances中元素从小到大的索引值
+
+    classCount = {}
+    for i in range(k):
+        votelLabel = lables[sortedDistindices[i]]
+        #取出索引对应的标签labels
+        #统计出现次数
+        classCount[votelLabel] = classCount.get(votelLabel, 0) +1
+        #按字典的值排序，key = operator.itemgetter(1),reversr降序排序
+        sortedDistindices = sorted(classCount.items(), key = operator.itemgetter(1), reverse=True)
+
+        return sortedDistindices[0][0]
+
+
+if __name__ == '__main__':
+    group, labels =createDataset()
+
+    test = [101, 20]
+
+    test_class = classify0(test, group, labels ,3)
+
+    print(test_class)
